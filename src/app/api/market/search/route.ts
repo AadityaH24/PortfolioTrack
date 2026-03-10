@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { yahooMarketProvider } from "../../../../lib/market/provider";
+import { localCsvMarketProvider } from "../../../../lib/market/localCsvProvider";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const results = await yahooMarketProvider.searchSymbols(q);
+    const results = await localCsvMarketProvider.searchSymbols(q);
     return NextResponse.json(
       { results },
       {

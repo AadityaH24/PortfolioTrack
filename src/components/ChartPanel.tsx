@@ -8,6 +8,8 @@ import {
   ISeriesApi,
   LineData,
   LineStyle,
+  CandlestickSeries,
+  LineSeries,
   createChart,
 } from "lightweight-charts";
 import type { Candle, Timeframe } from "../lib/market/types";
@@ -45,6 +47,7 @@ export function ChartPanel({ symbol }: ChartPanelProps) {
   }>({});
 
   const root = useAppStore((s) => s.root);
+  const ready = useAppStore((s) => s.ready);
   const setRoot = useAppStore((s) => s.setRoot);
 
   const title = useMemo(() => (symbol ? symbol.toUpperCase() : "Chart"), [symbol]);
@@ -78,29 +81,51 @@ export function ChartPanel({ symbol }: ChartPanelProps) {
       handleScale: true,
     });
 
-    const series = chart.addCandlestickSeries({
+    const seriesOptions = {
       upColor: "#10b981",
       downColor: "#ef4444",
       borderUpColor: "#10b981",
       borderDownColor: "#ef4444",
       wickUpColor: "#10b981",
       wickDownColor: "#ef4444",
-    });
+    };
 
-    const overlay = chart.addLineSeries({
+    const overlayOptions = {
       color: "#60a5fa",
       lineWidth: 2,
       lastValueVisible: false,
       priceLineVisible: false,
-    });
+    };
 
-    const trend = chart.addLineSeries({
+    const trendOptions = {
       color: "rgba(250,204,21,0.95)",
       lineWidth: 2,
       lastValueVisible: false,
       priceLineVisible: false,
       lineStyle: LineStyle.Solid,
-    });
+    };
+
+    // lightweight-charts v5 prefers `addSeries(SeriesType, options)`.
+    // Some builds still provide `addCandlestickSeries` / `addLineSeries`.
+    const anyChart = chart as unknown as {
+      addSeries?: (seriesType: unknown, options: unknown) => unknown;
+      addCandlestickSeries?: unknown;
+      addLineSeries?: unknown;
+    };
+
+    const series = (typeof anyChart.addCandlestickSeries === "function"
+      ? (anyChart.addCandlestickSeries as (options: unknown) => unknown)(
+          seriesOptions,
+        )
+      : anyChart.addSeries?.(CandlestickSeries, seriesOptions)) as ISeriesApi<"Candlestick">;
+
+    const overlay = (typeof anyChart.addLineSeries === "function"
+      ? (anyChart.addLineSeries as (options: unknown) => unknown)(overlayOptions)
+      : anyChart.addSeries?.(LineSeries, overlayOptions)) as ISeriesApi<"Line">;
+
+    const trend = (typeof anyChart.addLineSeries === "function"
+      ? (anyChart.addLineSeries as (options: unknown) => unknown)(trendOptions)
+      : anyChart.addSeries?.(LineSeries, trendOptions)) as ISeriesApi<"Line">;
 
     chartRef.current = chart;
     seriesRef.current = series;
@@ -139,17 +164,17 @@ export function ChartPanel({ symbol }: ChartPanelProps) {
 
   useEffect(() => {
     // Load persisted chart prefs when symbol changes.
-    if (!symbol || !root) return;
+    if (!symbol || !root || !ready) return;
     const pref = root.settings.chartPrefs[symbol.toUpperCase()];
     if (pref?.timeframe) setTimeframe(pref.timeframe as Timeframe);
     const useEma = pref?.indicators?.ema ?? false;
     const useSma = pref?.indicators?.sma ?? true;
     setIndicator(useEma && !useSma ? "ema" : "sma");
-  }, [root, symbol]);
+  }, [ready, root, symbol]);
 
   useEffect(() => {
     // Persist chart prefs (timeframe + indicator toggles) per symbol.
-    if (!symbol || !root) return;
+    if (!symbol || !ready) return;
     const key = symbol.toUpperCase();
     setRoot((current) => {
       const prev = current.settings.chartPrefs[key] ?? { timeframe: "1D", indicators: { sma: true, ema: false } };
@@ -169,7 +194,7 @@ export function ChartPanel({ symbol }: ChartPanelProps) {
         },
       };
     });
-  }, [indicator, root, setRoot, symbol, timeframe]);
+  }, [indicator, ready, setRoot, symbol, timeframe]);
 
   useEffect(() => {
     if (!symbol) return;

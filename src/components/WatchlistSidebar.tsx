@@ -17,6 +17,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "../store/useAppStore";
+import { SymbolSearch } from "./SymbolSearch";
 
 type SortableRowProps = {
   id: string;
@@ -161,7 +162,7 @@ export function WatchlistSidebar() {
         </summary>
         <div className="mt-3">
           <SidebarInner
-            watchlistsCount={watchlists.length}
+            watchlists={watchlists}
             selectedWatchlist={selectedWatchlist}
             selectedWatchlistId={selectedWatchlistId}
             items={items}
@@ -189,7 +190,7 @@ export function WatchlistSidebar() {
       <aside className="hidden w-72 flex-shrink-0 md:block">
         <div className="flex h-full flex-col gap-3 rounded-xl border border-zinc-200 bg-zinc-50/70 p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
           <SidebarInner
-            watchlistsCount={watchlists.length}
+            watchlists={watchlists}
             selectedWatchlist={selectedWatchlist}
             selectedWatchlistId={selectedWatchlistId}
             items={items}
@@ -218,7 +219,7 @@ export function WatchlistSidebar() {
 }
 
 type SidebarInnerProps = {
-  watchlistsCount: number;
+  watchlists: Array<{ id: string; name: string }>;
   selectedWatchlist: { id: string; name: string } | null;
   selectedWatchlistId: string | null;
   items: Array<{ id: string; symbol: string }>;
@@ -242,7 +243,7 @@ type SidebarInnerProps = {
 };
 
 function SidebarInner({
-  watchlistsCount,
+  watchlists,
   selectedWatchlist,
   selectedWatchlistId,
   items,
@@ -316,7 +317,7 @@ function SidebarInner({
             if (!selectedWatchlist) return;
             deleteWatchlist(selectedWatchlist.id);
           }}
-          disabled={!selectedWatchlist || watchlistsCount <= 1}
+          disabled={!selectedWatchlist || watchlists.length <= 1}
         >
           Delete
         </button>
@@ -353,29 +354,40 @@ function SidebarInner({
         </form>
       ) : null}
 
-      <form
-        className="flex items-center gap-2"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!selectedWatchlistId) return;
-          addSymbol(selectedWatchlistId, symbolDraft);
-          setSymbolDraft("");
-        }}
-      >
-        <input
-          value={symbolDraft}
-          onChange={(e) => setSymbolDraft(e.target.value)}
-          placeholder="Add symbol (e.g., AAPL)"
-          className="h-9 w-full rounded-lg border border-zinc-200 bg-white px-2 text-xs text-zinc-900 shadow-sm outline-none placeholder:text-zinc-400 focus:border-emerald-500/60 dark:border-zinc-800 dark:bg-black dark:text-zinc-50"
-        />
-        <button
-          type="submit"
-          className="h-9 rounded-lg bg-emerald-600 px-3 text-[11px] font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
-          disabled={!selectedWatchlistId}
+      <div className="flex flex-col gap-2">
+        <form
+          className="flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!selectedWatchlistId) return;
+            addSymbol(selectedWatchlistId, symbolDraft);
+            setSymbolDraft("");
+          }}
         >
-          Add
-        </button>
-      </form>
+          <input
+            value={symbolDraft}
+            onChange={(e) => setSymbolDraft(e.target.value)}
+            placeholder="Add symbol directly (e.g., ABB)"
+            className="h-9 w-full rounded-lg border border-zinc-200 bg-white px-2 text-xs text-zinc-900 shadow-sm outline-none placeholder:text-zinc-400 focus:border-emerald-500/60 dark:border-zinc-800 dark:bg-black dark:text-zinc-50"
+          />
+          <button
+            type="submit"
+            className="h-9 rounded-lg bg-emerald-600 px-3 text-[11px] font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+            disabled={!selectedWatchlistId}
+          >
+            Add
+          </button>
+        </form>
+        <SymbolSearch
+          disabled={!selectedWatchlistId}
+          onSelect={(symbol) => {
+            if (!selectedWatchlistId) return;
+            addSymbol(selectedWatchlistId, symbol);
+            selectSymbol(selectedWatchlistId, symbol);
+            routerPush(`/s/${encodeURIComponent(symbol)}`);
+          }}
+        />
+      </div>
 
       <div className="flex flex-1 flex-col gap-2 overflow-auto">
         {selectedWatchlistId ? (

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { yahooMarketProvider } from "../../../../lib/market/provider";
+import { localCsvMarketProvider } from "../../../../lib/market/localCsvProvider";
 
 const TF = z.enum(["1D", "5D", "1M", "3M", "1Y"]);
 
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const candles = await yahooMarketProvider.getCandles(
+    const candles = await localCsvMarketProvider.getCandles(
       symbol,
       timeframeParsed.data,
     );
