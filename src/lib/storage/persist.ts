@@ -75,7 +75,7 @@ async function writeRaw(value: PersistedRoot): Promise<void> {
   }
 }
 
-function createEmptyRoot(): PersistedRoot {
+export function createEmptyRoot(): PersistedRoot {
   const now = new Date().toISOString();
 
   return {
@@ -114,6 +114,10 @@ function migrateToLatest(raw: unknown): PersistedRoot {
   });
   return createEmptyRoot();
 }
+
+export const __test__ = {
+  migrateToLatest,
+};
 
 export async function loadPersistedRoot(): Promise<PersistedRoot> {
   const raw = await readRaw();

@@ -15,7 +15,6 @@ export function AppProviders({ children }: AppProvidersProps) {
   const hydrate = useAppStore((s) => s.hydrate);
   const root = useAppStore((s) => s.root);
   const ready = useAppStore((s) => s.ready);
-  const setRoot = useAppStore((s) => s.setRoot);
   const [bootstrapped, setBootstrapped] = useState(false);
 
   useEffect(() => {
@@ -28,7 +27,10 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   useEffect(() => {
     if (!ready || !root) return;
-    void savePersistedRoot(root);
+    const handle = setTimeout(() => {
+      void savePersistedRoot(root);
+    }, 250);
+    return () => clearTimeout(handle);
   }, [ready, root]);
 
   if (!bootstrapped) {
