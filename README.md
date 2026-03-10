@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Trading Chart Viewer
 
-## Getting Started
+A lightweight trading chart viewer that allows users to quickly search for stock symbols, organize them into watchlists, and visualize price charts with adjustable time ranges.
 
-First, run the development server:
+Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This application provides a simple interface for tracking and analyzing stock market data. The layout is designed to separate symbol discovery and organization from chart visualization, making it easy to monitor multiple assets efficiently.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The interface is divided into two main panels:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Left Panel: Symbol search and watchlist management
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Right Panel: Interactive chart viewer for the selected symbol
 
-## Learn More
+Features
+1. Symbol Search
 
-To learn more about Next.js, take a look at the following resources:
+Users can search for stock symbols using a search bar located in the left panel.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Capabilities:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Search by symbol or company name
 
-## Deploy on Vercel
+Quickly preview available assets
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Add symbols directly to watchlists
 
+2. Watchlists
+
+Watchlists allow users to organize and track multiple stocks.
+
+Features:
+
+Create multiple watchlists
+
+Add or remove symbols
+
+Quickly switch between tracked assets
+
+Click a symbol to instantly load its chart
+
+3. Interactive Chart Viewer
+
+The right panel displays a large chart for the selected symbol.
+
+Chart capabilities:
+
+Visualize historical price data
+
+Switch between different time ranges
+
+Quickly analyze trends and movements
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<img width="1267" height="984" alt="image" src="https://github.com/user-attachments/assets/5c0f7cbb-53db-4c0e-bf7d-24bcbfcec95e" />
+<img width="1206" height="985" alt="image" src="https://github.com/user-attachments/assets/d40ac33e-90ac-4719-a34b-1cfc79e96eb2" />
